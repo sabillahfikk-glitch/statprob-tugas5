@@ -93,9 +93,13 @@ def check_legacy():
         ["git", "diff", "--name-only"],
         capture_output=True, text=True, check=True,
     ).stdout.splitlines()
-    bad = [p for p in changed + dirty if re.search(r"output/0[1-9]_", p)]
+    allowed = {"project uas/output/07_histogram.png"}  # di-override pengguna untuk perbaikan label legend
+    bad = [
+        p for p in changed + dirty
+        if re.search(r"output/0[1-9]_", p) and p.replace("\\", "/") not in allowed
+    ]
     assert not bad, "file output lama ikut berubah: " + ", ".join(bad)
-    print("PASS legacy: file output 01_-09_ tidak diubah (committed maupun working tree)")
+    print("PASS legacy: hanya 07_histogram.png yang diubah (sesuai permintaan); file 01_-09_ lain utuh")
 
 
 def check_repro():
@@ -133,8 +137,50 @@ def check_repro():
     print("PASS repro: regplot deterministik antar dua eksekusi")
 
 
+def check_histogram():
+    """Delivered 07_histogram.png must match the current notebook histogram cell."""
+    nb, _ = notebook_source()
+    cell = next(c for c in nb["cells"] if "07_histogram.png" in "".join(c.get("source", [])))
+    src = "".join(cell["source"])
+    prelude = (
+        "import sys\n"
+        "import numpy as np\n"
+        "import pandas as pd\n"
+        "import matplotlib\n"
+        'matplotlib.use("Agg")\n'
+        "import matplotlib.pyplot as plt\n"
+        "import seaborn as sns\n"
+        "from pathlib import Path\n"
+        'sns.set_theme(style="whitegrid")\n'
+        'pd.set_option("display.float_format", lambda x: f"{x:.3f}")\n'
+        "OUTPUT = Path(sys.argv[2])\n"
+        "OUTPUT.mkdir(parents=True, exist_ok=True)\n"
+        'df = pd.read_csv(sys.argv[1]).dropna(subset=["IPK"])\n'
+        'df["Screen_Time_Jam"] = df["Screen_Time_Jam"].fillna(df["Screen_Time_Jam"].median())\n'
+        'idx_error = df.index[df["Screen_Time_Jam"] >= 20]\n'
+        'df.loc[idx_error, "Screen_Time_Jam"] = np.nan\n'
+        'df["Screen_Time_Jam"] = df["Screen_Time_Jam"].fillna(df["Screen_Time_Jam"].median())\n'
+        'kolom_numerik = ["Durasi_Tidur_Jam", "Screen_Time_Jam", "Jam_Belajar_Mingguan", "Skor_Stres", "IPK"]\n'
+    )
+    csv = ROOT / "project uas" / "Kelompok_23_Tema_C_Akademik_Tidur.csv"
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        script = tmp / "hist.py"
+        script.write_text(prelude + src, encoding="utf-8")
+        outdir = tmp / "out"
+        subprocess.run(
+            [sys.executable, str(script), str(csv), str(outdir)], check=True, capture_output=True,
+        )
+        fresh = (outdir / "07_histogram.png").read_bytes()
+    delivered = (OUT / "07_histogram.png").read_bytes()
+    assert hashlib.sha256(fresh).digest() == hashlib.sha256(delivered).digest(), (
+        "07_histogram.png tidak sesuai dengan kode notebook saat ini (label legend belum ter-update)"
+    )
+    print("PASS histogram: file PNG sesuai dengan kode notebook (label legend benar)")
+
+
 def check_all():
-    for name in ["notebook", "legacy", "charts", "report", "poster", "repro"]:
+    for name in ["notebook", "legacy", "charts", "report", "poster", "repro", "histogram"]:
         CHECKS[name]()
     print("PASS all: seluruh verifikasi Task 5 lolos")
 
@@ -146,6 +192,7 @@ CHECKS = {
     "report": check_report,
     "poster": check_poster,
     "repro": check_repro,
+    "histogram": check_histogram,
     "all": check_all,
 }
 
