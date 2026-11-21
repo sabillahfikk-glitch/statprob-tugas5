@@ -4,6 +4,8 @@ Usage (from repo root): python checks/verify.py <notebook|charts|report|poster|l
 """
 
 import json
+import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -76,11 +78,33 @@ def check_poster():
     print("PASS poster: poster infografis PNG dan HTML valid")
 
 
+def check_legacy():
+    base = subprocess.run(
+        ["git", "merge-base", "main", "HEAD"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    changed = subprocess.run(
+        ["git", "diff", "--name-only", base, "HEAD"],
+        capture_output=True, text=True, check=True,
+    ).stdout.splitlines()
+    bad = [p for p in changed if re.search(r"output/0[1-9]_", p)]
+    assert not bad, "file output lama ikut berubah: " + ", ".join(bad)
+    print("PASS legacy: file output 01_-09_ tidak diubah")
+
+
+def check_all():
+    for name in ["notebook", "legacy", "charts", "report", "poster"]:
+        CHECKS[name]()
+    print("PASS all: seluruh verifikasi Task 5 lolos")
+
+
 CHECKS = {
     "notebook": check_notebook,
+    "legacy": check_legacy,
     "charts": check_charts,
     "report": check_report,
     "poster": check_poster,
+    "all": check_all,
 }
 
 
