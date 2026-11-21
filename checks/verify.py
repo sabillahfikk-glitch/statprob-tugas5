@@ -65,7 +65,23 @@ def check_report():
     print("PASS report: laporan teknis HTML mandiri valid")
 
 
-CHECKS = {"notebook": check_notebook, "charts": check_charts, "report": check_report}
+def check_poster():
+    img_path = OUT / "15_poster_infografis.png"
+    assert img_path.exists(), "poster PNG belum ada"
+    with Image.open(img_path) as img:
+        assert img.format == "PNG", "poster bukan PNG"
+        assert img.height > img.width, "poster harus potrait"
+        assert img.width >= 1000 and img.height >= 1400, "poster terlalu kecil"
+    assert (OUT / "16_poster_infografis.html").exists(), "poster HTML belum ada"
+    print("PASS poster: poster infografis PNG dan HTML valid")
+
+
+CHECKS = {
+    "notebook": check_notebook,
+    "charts": check_charts,
+    "report": check_report,
+    "poster": check_poster,
+}
 
 
 def main():
