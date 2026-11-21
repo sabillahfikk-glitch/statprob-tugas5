@@ -67,7 +67,27 @@ def check_js():
     print("PASS js: dashboard.js mengonsumsi data dan mengikat filter")
 
 
-CHECKS = {"data": check_data, "files": check_files, "js": check_js}
+def check_entry():
+    html = (OUT / "index.html").read_text(encoding="utf-8")
+    assert "dashboard.html" in html, "tautan dashboard belum ada di index.html"
+    assert "Laporan Teknis" in html, "tautan laporan teknis hilang"
+    assert "Poster Infografis" in html, "tautan poster hilang"
+    print("PASS entry: halaman masuk menautkan dashboard, laporan, dan poster")
+
+
+def check_all():
+    for name in ["data", "files", "js", "entry"]:
+        CHECKS[name]()
+    print("PASS all: seluruh verifikasi dashboard lolos")
+
+
+CHECKS = {
+    "data": check_data,
+    "files": check_files,
+    "js": check_js,
+    "entry": check_entry,
+    "all": check_all,
+}
 
 
 def main():
