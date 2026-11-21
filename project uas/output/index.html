@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Statprob — Tugas 5: Data Visualizer &amp; Editor</title>
+<style>
+  :root { --ink:#1f2d3d; --muted:#5b6b7b; --accent:#2e5c8a; --line:#d9e2ec; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:48px 20px; background:#f4f7fa; color:var(--ink);
+         font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:880px; margin:auto; background:#fff; padding:40px;
+         border-radius:14px; box-shadow:0 2px 16px rgba(31,45,61,.08); }
+  h1 { margin:0 0 8px; color:var(--accent); font-size:32px; }
+  .sub { color:var(--muted); margin:0 0 32px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  a.card { display:block; padding:22px; border:1px solid var(--line); border-radius:12px;
+           background:#eef4fa; text-decoration:none; color:var(--ink); transition:.15s; }
+  a.card:hover { border-color:var(--accent); transform:translateY(-2px); }
+  a.card b { display:block; color:var(--accent); font-size:18px; margin-bottom:6px; }
+  a.card span { color:var(--muted); font-size:13px; }
+  .foot { margin-top:32px; font-size:13px; color:var(--muted); line-height:1.7; }
+  code { background:#eef4fa; padding:2px 6px; border-radius:4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Akademik &amp; Tidur</h1>
+  <p class="sub">Tugas 5 — Data Visualizer &amp; Editor · Kelompok 23 · Tema C · 347 responden</p>
+  <div class="cards">
+    <a class="card" href="14_laporan_teknis.html"><b>Laporan Teknis</b><span>Analisis lengkap beserta 9 grafik, siap dicetak ke PDF</span></a>
+    <a class="card" href="16_poster_infografis.html"><b>Poster Infografis</b><span>Ringkasan visual KPI, grafik, dan temuan kunci</span></a>
+    <a class="card" href="15_poster_infografis.png"><b>Poster PNG</b><span>Gambar resolusi tinggi untuk dicetak atau dibagikan</span></a>
+  </div>
+  <p class="foot">Seluruh tampilan dihasilkan dari notebook <code>project uas/.ipynb</code> menggunakan pandas, matplotlib, dan seaborn.
+  Sumber kode: <a href="https://github.com/sabillahfikk-glitch/statprob-tugas5">sabillahfikk-glitch/statprob-tugas5</a>.</p>
+</main>
+</body>
+</html>
