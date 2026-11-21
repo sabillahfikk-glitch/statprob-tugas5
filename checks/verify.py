@@ -50,7 +50,22 @@ def check_charts():
     print("PASS charts: 4 grafik pendukung valid")
 
 
-CHECKS = {"notebook": check_notebook, "charts": check_charts}
+def check_report():
+    path = OUT / "14_laporan_teknis.html"
+    assert path.exists(), "laporan teknis belum ada"
+    html = path.read_text(encoding="utf-8")
+    assert "<!DOCTYPE html>" in html, "bukan dokumen HTML"
+    for heading in ["Ringkasan Eksekutif", "Statistika Deskriptif", "Kualitas Data", "Visualisasi"]:
+        assert heading in html, f"bagian '{heading}' belum ada"
+    assert html.count("data:image/png;base64,") >= 9, "gambar tidak disisipkan sebagai base64"
+    assert 'src="output/' not in html, "laporan masih bergantung pada folder output/"
+    assert 'src="http' not in html, "laporan bergantung pada gambar eksternal"
+    for value in ["347", "6.355", "58.292", "3.250"]:
+        assert value in html, f"nilai kunci {value} tidak ada di laporan"
+    print("PASS report: laporan teknis HTML mandiri valid")
+
+
+CHECKS = {"notebook": check_notebook, "charts": check_charts, "report": check_report}
 
 
 def main():
