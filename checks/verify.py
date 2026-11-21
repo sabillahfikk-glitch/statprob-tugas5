@@ -7,9 +7,18 @@ import json
 import sys
 from pathlib import Path
 
+from PIL import Image
+
 ROOT = Path(__file__).resolve().parent.parent
 NB_PATH = ROOT / "project uas" / ".ipynb"
 OUT = ROOT / "project uas" / "output"
+
+CHART_FILES = [
+    "10_korelasi_heatmap.png",
+    "11_scatter_tidur_stres.png",
+    "12_scatter_screentime_ipk.png",
+    "13_rataan_ipk_stres_fakultas.png",
+]
 
 
 def notebook_source():
@@ -28,7 +37,20 @@ def check_notebook():
     print("PASS notebook: legend diperbaiki dan header 1.8 ada")
 
 
-CHECKS = {"notebook": check_notebook}
+def check_charts():
+    _, sources = notebook_source()
+    all_source = "\n".join(sources)
+    for name in CHART_FILES:
+        path = OUT / name
+        assert path.exists(), f"{name} belum ada"
+        with Image.open(path) as img:
+            assert img.format == "PNG", f"{name} bukan PNG"
+            assert img.width >= 800 and img.height >= 500, f"{name} terlalu kecil"
+        assert name in all_source, f"cell penyimpan {name} belum ada di notebook"
+    print("PASS charts: 4 grafik pendukung valid")
+
+
+CHECKS = {"notebook": check_notebook, "charts": check_charts}
 
 
 def main():
