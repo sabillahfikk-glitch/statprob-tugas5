@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akademik &amp; Tidur — Analytics Dashboard</title>
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <h1>Akademik &amp; Tidur</h1>
+    <p>Analytics Dashboard · Kelompok 23 · Tema C · Statistika Probabilitas</p>
+  </div>
+  <span class="topbar-tag">Data responden mahasiswa</span>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Filter Data</h2>
+    <label for="filter-fakultas">Fakultas</label>
+    <select id="filter-fakultas"><option value="">Semua fakultas</option></select>
+
+    <label for="filter-gender">Jenis Kelamin</label>
+    <select id="filter-gender"><option value="">Semua</option></select>
+
+    <label for="filter-kafein">Konsumsi Kafein</label>
+    <select id="filter-kafein"><option value="">Semua</option></select>
+
+    <button id="filter-reset" type="button">Reset filter</button>
+    <p class="hint">Grafik, angka, dan tabel akan mengikuti filter yang dipilih.</p>
+  </aside>
+
+  <main class="content">
+    <section class="kpis">
+      <article class="kpi"><span class="kpi-label">Responden</span><strong class="kpi-value" id="kpi-n">—</strong></article>
+      <article class="kpi"><span class="kpi-label">Rata-rata tidur</span><strong class="kpi-value" id="kpi-tidur">—</strong></article>
+      <article class="kpi"><span class="kpi-label">Rata-rata stres</span><strong class="kpi-value" id="kpi-stres">—</strong></article>
+      <article class="kpi"><span class="kpi-label">Rata-rata IPK</span><strong class="kpi-value" id="kpi-ipk">—</strong></article>
+    </section>
+
+    <section class="charts">
+      <article class="panel"><h3>Jumlah Responden per Fakultas</h3><canvas id="chart-fakultas"></canvas></article>
+      <article class="panel"><h3>Konsumsi Kafein</h3><canvas id="chart-kafein"></canvas></article>
+      <article class="panel"><h3>Durasi Tidur vs Skor Stres</h3><canvas id="chart-tidur-stres"></canvas></article>
+      <article class="panel"><h3>IPK &amp; Stres per Fakultas</h3><canvas id="chart-ipk-fakultas"></canvas></article>
+      <article class="panel panel-wide">
+        <h3>Matriks Korelasi Variabel Numerik</h3>
+        <img id="heatmap" src="10_korelasi_heatmap.png" alt="Matriks korelasi variabel numerik">
+      </article>
+    </section>
+
+    <section class="panel table-panel">
+      <h3>Ringkasan per Fakultas</h3>
+      <table>
+        <thead><tr><th>Fakultas</th><th>n</th><th>Tidur (jam)</th><th>Skor stres</th><th>IPK</th></tr></thead>
+        <tbody id="ringkasan-body"></tbody>
+      </table>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <a href="14_laporan_teknis.html">Laporan Teknis</a>
+  <a href="16_poster_infografis.html">Poster Infografis</a>
+  <a href="index.html">Halaman Utama</a>
+</footer>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="dashboard-data.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

@@ -31,7 +31,34 @@ def check_data():
     print("PASS data: 347 record, 8 kunci, mean tidur 6.355")
 
 
-CHECKS = {"data": check_data}
+IDS = [
+    "kpi-n", "kpi-tidur", "kpi-stres", "kpi-ipk",
+    "filter-fakultas", "filter-gender", "filter-kafein", "filter-reset",
+    "chart-fakultas", "chart-kafein", "chart-tidur-stres", "chart-ipk-fakultas",
+    "ringkasan-body", "heatmap",
+]
+
+
+def check_files():
+    for name in ["dashboard.html", "dashboard.css", "dashboard-data.js", "vendor/chart.umd.min.js"]:
+        assert (OUT / name).exists(), f"{name} belum ada"
+    vendor = OUT / "vendor" / "chart.umd.min.js"
+    assert len(vendor.read_bytes()) > 100_000, "Chart.js lokal terlalu kecil / belum terunduh"
+    html = (OUT / "dashboard.html").read_text(encoding="utf-8")
+    for element_id in IDS:
+        assert f'id="{element_id}"' in html, f'id "{element_id}" belum ada di HTML'
+    assert "dashboard-data.js" in html, "data script belum dimuat"
+    assert "vendor/chart.umd.min.js" in html, "Chart.js lokal belum dimuat"
+    for name in ["dashboard.html", "dashboard.css", "dashboard-data.js"]:
+        isi = (OUT / name).read_text(encoding="utf-8")
+        assert "https://" not in isi, f"{name} masih memuat tautan CDN/eksternal"
+        assert "fetch(" not in isi, f"{name} memakai fetch() (tidak jalan dari file://)"
+    css = (OUT / "dashboard.css").read_text(encoding="utf-8")
+    assert "@media" in css, "CSS tidak punya aturan responsif"
+    print("PASS files: HTML/CSS/vendor lokal lengkap, tanpa CDN dan fetch")
+
+
+CHECKS = {"data": check_data, "files": check_files}
 
 
 def main():
