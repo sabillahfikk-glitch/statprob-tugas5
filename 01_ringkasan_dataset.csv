@@ -1,0 +1,10 @@
+,Tipe_Data,Jumlah_Terisi,Missing,Nilai_Unik
+ID_Responden,str,350,0,350
+Fakultas,str,350,0,3
+Jenis_Kelamin,str,350,0,2
+Konsumsi_Kafein,str,350,0,2
+Durasi_Tidur_Jam,float64,350,0,56
+Screen_Time_Jam,float64,347,3,73
+Jam_Belajar_Mingguan,float64,350,0,156
+Skor_Stres,float64,350,0,228
+IPK,float64,347,3,117

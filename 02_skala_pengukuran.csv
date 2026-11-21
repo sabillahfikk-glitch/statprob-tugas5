@@ -1,0 +1,10 @@
+Kolom,Skala
+ID_Responden,Nominal
+Fakultas,Nominal
+Jenis_Kelamin,Nominal
+Konsumsi_Kafein,Ordinal
+Durasi_Tidur_Jam,Rasio
+Screen_Time_Jam,Rasio
+Jam_Belajar_Mingguan,Rasio
+Skor_Stres,Interval
+IPK,Interval
