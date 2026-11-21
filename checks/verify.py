@@ -1,12 +1,14 @@
 """Verification checks for Task 5 deliverables.
 
-Usage (from repo root): python checks/verify.py <notebook|charts|report|poster|legacy|all>
+Usage (from repo root): python checks/verify.py <notebook|charts|report|poster|legacy|repro|all>
 """
 
+import hashlib
 import json
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from PIL import Image
@@ -87,13 +89,52 @@ def check_legacy():
         ["git", "diff", "--name-only", base, "HEAD"],
         capture_output=True, text=True, check=True,
     ).stdout.splitlines()
-    bad = [p for p in changed if re.search(r"output/0[1-9]_", p)]
+    dirty = subprocess.run(
+        ["git", "diff", "--name-only"],
+        capture_output=True, text=True, check=True,
+    ).stdout.splitlines()
+    bad = [p for p in changed + dirty if re.search(r"output/0[1-9]_", p)]
     assert not bad, "file output lama ikut berubah: " + ", ".join(bad)
-    print("PASS legacy: file output 01_-09_ tidak diubah")
+    print("PASS legacy: file output 01_-09_ tidak diubah (committed maupun working tree)")
+
+
+def check_repro():
+    """Run the real regplot cell twice in fresh processes; output bytes must match."""
+    nb, _ = notebook_source()
+    cell = next(c for c in nb["cells"] if c.get("id") == "tugas5-regresi-tidur-stres")
+    src = "".join(cell["source"])
+    prelude = (
+        "import sys\n"
+        "import pandas as pd\n"
+        "import matplotlib\n"
+        'matplotlib.use("Agg")\n'
+        "import matplotlib.pyplot as plt\n"
+        "import seaborn as sns\n"
+        "from pathlib import Path\n"
+        'df = pd.read_csv(sys.argv[1]).dropna(subset=["IPK"])\n'
+        "OUTPUT = Path(sys.argv[2])\n"
+        "OUTPUT.mkdir(parents=True, exist_ok=True)\n"
+    )
+    csv = ROOT / "project uas" / "Kelompok_23_Tema_C_Akademik_Tidur.csv"
+    hashes = []
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        for i in range(2):
+            script = tmp / f"run{i}.py"
+            script.write_text(prelude + src, encoding="utf-8")
+            outdir = tmp / f"out{i}"
+            subprocess.run(
+                [sys.executable, str(script), str(csv), str(outdir)], check=True,
+                capture_output=True,
+            )
+            png = outdir / "11_scatter_tidur_stres.png"
+            hashes.append(hashlib.sha256(png.read_bytes()).hexdigest())
+    assert hashes[0] == hashes[1], "grafik regplot berbeda antar dua eksekusi (tidak reproducible)"
+    print("PASS repro: regplot deterministik antar dua eksekusi")
 
 
 def check_all():
-    for name in ["notebook", "legacy", "charts", "report", "poster"]:
+    for name in ["notebook", "legacy", "charts", "report", "poster", "repro"]:
         CHECKS[name]()
     print("PASS all: seluruh verifikasi Task 5 lolos")
 
@@ -104,6 +145,7 @@ CHECKS = {
     "charts": check_charts,
     "report": check_report,
     "poster": check_poster,
+    "repro": check_repro,
     "all": check_all,
 }
 
