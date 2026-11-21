@@ -58,7 +58,16 @@ def check_files():
     print("PASS files: HTML/CSS/vendor lokal lengkap, tanpa CDN dan fetch")
 
 
-CHECKS = {"data": check_data, "files": check_files}
+def check_js():
+    js = (OUT / "dashboard.js").read_text(encoding="utf-8")
+    assert "window.SLEEP_DATA" in js, "JS tidak mengonsumsi window.SLEEP_DATA"
+    assert "window.__dashboard" in js, "helper window.__dashboard belum ada"
+    assert "filter-fakultas" in js, "JS tidak mengikat filter fakultas"
+    assert "filter-reset" in js, "JS tidak mengikat tombol reset"
+    print("PASS js: dashboard.js mengonsumsi data dan mengikat filter")
+
+
+CHECKS = {"data": check_data, "files": check_files, "js": check_js}
 
 
 def main():
